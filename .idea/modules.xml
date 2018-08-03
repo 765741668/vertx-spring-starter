@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/vertx-spring-starter-parent.iml" filepath="$PROJECT_DIR$/vertx-spring-starter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vs-core/vs-core.iml" filepath="$PROJECT_DIR$/vs-core/vs-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vs-main/vs-main.iml" filepath="$PROJECT_DIR$/vs-main/vs-main.iml" />
+    </modules>
+  </component>
+</project>
