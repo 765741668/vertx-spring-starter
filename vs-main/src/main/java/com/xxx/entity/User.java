@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonObject;
 
 import java.util.Date;
 
@@ -11,10 +13,11 @@ import java.util.Date;
  * @author Xu Haidong
  * @date 2018/8/2
  */
+@DataObject(generateConverter = true)
 public class User {
 
     @TableId("test_id")
-    private long id;
+    private Long id;
     /**
      * 名称
      */
@@ -22,7 +25,7 @@ public class User {
     /**
      * 年龄
      */
-    private int age;
+    private Integer age;
     /**
      * 这里故意演示注解可无
      */
@@ -40,6 +43,10 @@ public class User {
     private String phone;
 
     public User() {
+    }
+
+    public User(JsonObject jsonObject) {
+        UserConverter.fromJson(jsonObject, this);
     }
 
 
@@ -77,15 +84,6 @@ public class User {
         this.testDate = testDate;
     }
 
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
     public String getPhone() {
         return phone;
     }
@@ -94,11 +92,25 @@ public class User {
         this.phone = phone;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+        UserConverter.toJson(this, json);
+        return json;
     }
 }

@@ -10,12 +10,11 @@ public final class RouterUtil {
     private static Router router;
 
     private RouterUtil() {
-        router = Router.router(VertxUtil.getVertxInstance());
     }
 
     public static Router getRouter() {
         if (router == null) {
-            new RouterUtil();
+            router = Router.router(VertxUtil.getVertxInstance());
         }
         return router;
     }

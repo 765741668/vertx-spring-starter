@@ -42,8 +42,8 @@ public class MybatisPlusConfig {
     /**
      * 性能分析拦截器，不建议生产使用
      */
-    @Bean
-    public PerformanceInterceptor performanceInterceptor(){
-        return new PerformanceInterceptor();
-    }
+//    @Bean
+//    public PerformanceInterceptor performanceInterceptor(){
+//        return new PerformanceInterceptor();
+//    }
 }

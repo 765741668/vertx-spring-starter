@@ -21,4 +21,9 @@ public @interface RouteMapping {
     /**** 接口描述 *****/
     String descript() default "";
 
+    /**
+     * 注册顺序，数字越大越先注册
+     */
+    int order() default 0;
+
 }

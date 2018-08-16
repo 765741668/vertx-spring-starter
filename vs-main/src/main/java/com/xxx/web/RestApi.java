@@ -1,27 +1,44 @@
 package com.xxx.web;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xxx.anno.RouteHandler;
 import com.xxx.anno.RouteMapping;
 import com.xxx.anno.RouteMethod;
-import com.xxx.model.BaseSenderHandler;
+import com.xxx.entity.User;
 import com.xxx.model.ReplyObj;
-import com.xxx.service.impl.TestServiceImpl;
-import com.xxx.service.impl.UserServiceImpl;
+import com.xxx.service.UserAsyncService;
+import com.xxx.service2.UserTwoAsyncService;
+import com.xxx.utils.AsyncServiceUtil;
+import com.xxx.utils.HttpUtil;
 import com.xxx.utils.ParamUtil;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
+import java.util.List;
+
+import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
+import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
  * @author Xu Haidong
  * @date 2018/8/2
  */
 @RouteHandler("restapp")
-public class RestApi extends BaseSenderHandler {
+public class RestApi {
 
-    @RouteMapping(value = "/test", method = RouteMethod.GET)
+    private UserAsyncService userAsyncService = AsyncServiceUtil.getAsyncServiceInstance(UserAsyncService.class);
+
+    private UserTwoAsyncService userTwoAsyncService = AsyncServiceUtil.getAsyncServiceInstance(UserTwoAsyncService.class);
+
+    @RouteMapping(value = "/*", method = RouteMethod.ROUTE, order = 2)
+    public Handler<RoutingContext> appFilter() {
+        return ctx -> {
+            System.err.println("我是appFilter过滤器！");
+            ctx.next();
+        };
+    }
+
+    @RouteMapping(value = "/test/:id", method = RouteMethod.GET)
     public Handler<RoutingContext> myTest() {
         return ctx -> {
             JsonObject param = ParamUtil.getRequestParams(ctx);
@@ -30,14 +47,18 @@ public class RestApi extends BaseSenderHandler {
         };
     }
 
-    @RouteMapping(value = "/doTest", method = RouteMethod.GET)
-    public Handler<RoutingContext> doTest() {
+    @RouteMapping(value = "/listUsers", method = RouteMethod.GET)
+    public Handler<RoutingContext> listUsers() {
         return ctx -> {
             JsonObject param = ParamUtil.getRequestParams(ctx);
-            sendProcess(ctx, TestServiceImpl.class.getName(), "doTest", param, ar -> {
+            if (param.containsKey("age")) {
+                param.put("age", Integer.valueOf(param.getString("age")));
+            }
+            User user = new User(param);
+            userAsyncService.listUsers(user, ar -> {
                 if (ar.succeeded()) {
-                    JsonObject result = ar.result().body();
-                    ctx.response().setStatusCode(200).end(ReplyObj.build().setCode(200).setData(result).toString());
+                    List<User> userList = ar.result();
+                    ctx.response().setStatusCode(HTTP_OK).end(ReplyObj.build().setData(userList).toString());
                 } else {
                     ctx.response().setStatusCode(500).end(ReplyObj.build().setCode(500).setMsg(ar.cause().getMessage()).toString());
                 }
@@ -45,17 +66,16 @@ public class RestApi extends BaseSenderHandler {
         };
     }
 
-
-    @RouteMapping(value = "/findUser", method = RouteMethod.GET)
-    public Handler<RoutingContext> findUser() {
+    @RouteMapping(value = "/findUserById", method = RouteMethod.GET)
+    public Handler<RoutingContext> findUserById() {
         return ctx -> {
             JsonObject param = ParamUtil.getRequestParams(ctx);
-            sendProcess(ctx, UserServiceImpl.class.getName(), "findUser", param, ar -> {
+            userTwoAsyncService.findUser(Long.valueOf(param.getString("id")), ar -> {
                 if (ar.succeeded()) {
-                    JsonObject result = ar.result().body();
-                    ctx.response().setStatusCode(200).end(ReplyObj.build().setCode(200).setData(result).toString());
+                    User user = ar.result();
+                    HttpUtil.fireJsonResponse(ctx.response(), HTTP_OK, ReplyObj.build().setData(user));
                 } else {
-                    ctx.response().setStatusCode(500).end(ReplyObj.build().setCode(500).setMsg(ar.cause().getMessage()).toString());
+                    HttpUtil.fireJsonResponse(ctx.response(), HTTP_INTERNAL_ERROR, ReplyObj.build().setData(ar.cause().getMessage()).setCode(HTTP_INTERNAL_ERROR));
                 }
             });
         };

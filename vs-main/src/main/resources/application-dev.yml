@@ -42,3 +42,10 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
+
+#webApi扫描包路径
+web-api-packages: com.xxx.web
+#异步服务扫描包路径
+async-service-impl-packages: com.xxx.service.impl,com.xxx.service2.impl
+
+http-server-port: 8989

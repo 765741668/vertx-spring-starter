@@ -25,6 +25,10 @@ public class RouterRegistryVerticle extends AbstractVerticle {
 
     private Router router;
 
+    public RouterRegistryVerticle(Router router) {
+        this.router = router;
+    }
+
     public RouterRegistryVerticle(Router router, int port) {
         this.router = router;
         if (port > 0) {

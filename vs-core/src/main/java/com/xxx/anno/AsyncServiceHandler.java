@@ -6,18 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Router API类 标识注解
+ * 异步服务
+ *
+ * @author Xu Haidong
+ * @date 2018/8/15
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RouteHandler {
-
-    String value() default "";
-
-    boolean isOpen() default false;
-
-    /**
-     * 注册顺序，数字越大越先注册
-     */
-    int order() default 0;
+public @interface AsyncServiceHandler {
 }

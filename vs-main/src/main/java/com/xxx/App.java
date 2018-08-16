@@ -6,6 +6,7 @@ import com.xxx.vertx.VertxUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBusOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -22,6 +23,15 @@ import java.io.IOException;
 @ComponentScan("com.xxx")
 public class App {
 
+    @Value("${web-api-packages}")
+    private String webApiPackages;
+
+    @Value("${async-service-impl-packages}")
+    private String asyncServiceImplPackages;
+
+    @Value("${http-server-port}")
+    private int httpServerPort;
+
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }
@@ -29,18 +39,18 @@ public class App {
     @EventListener
     public void deployVerticles(ApplicationReadyEvent event) {
         EventBusOptions eventBusOptions = new EventBusOptions();
+        //便于调试 设定超时等时间较长 生产环境建议适当调整
         eventBusOptions.setConnectTimeout(1000 * 60 * 30);
         Vertx vertx = Vertx.vertx(
-                new VertxOptions().setWorkerPoolSize(20)
+                new VertxOptions()
                         .setEventBusOptions(eventBusOptions)
-                        .setMaxWorkerExecuteTime(Long.MAX_VALUE)
                         .setBlockedThreadCheckInterval(999999999L)
                         .setMaxEventLoopExecuteTime(Long.MAX_VALUE)
         );
         VertxUtil.init(vertx);
         try {
-            DeployVertxServer.startDeploy(new RouterHandlerFactory("com.xxx.web", "api").createRouter(),
-                    "com.xxx.service", 8989);
+            DeployVertxServer.startDeploy(new RouterHandlerFactory(webApiPackages).createRouter(),
+                    asyncServiceImplPackages, httpServerPort);
         } catch (IOException e) {
             e.printStackTrace();
         }

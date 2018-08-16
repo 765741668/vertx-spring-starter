@@ -35,8 +35,8 @@ public final class ParamUtil {
         try {
             params = getRequestParams(ctx.request().params());
             //ip
-            params.put("serverIp", ctx.request().localAddress().host());
-            params.put("clientIp", ctx.request().remoteAddress().host());
+//            params.put("serverIp", ctx.request().localAddress().host());
+//            params.put("clientIp", ctx.request().remoteAddress().host());
 
             JsonObject param = ctx.getBodyAsJson();
             if (param != null) {
