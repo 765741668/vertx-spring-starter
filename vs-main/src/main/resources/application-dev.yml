@@ -47,9 +47,9 @@ mybatis-plus:
 web-api-packages: com.xxx.web
 #异步服务扫描包路径
 async-service-impl-packages: com.xxx.service.impl,com.xxx.service2.impl
-
+#Http服务器端口号
 http-server-port: 8989
-
+#工作线程池大小
 worker-pool-size: 40
-
+#异步服务实例数，建议与CPU核数相同
 async-service-instances: 2
