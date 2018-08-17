@@ -4,3 +4,4 @@
 
 项目使用了vert.x-web框架，在web层与传统spring的服务层之间加入了异步服务层。异步服务层使用vert.x-service-proxy服务代理框架实现，简化了EventBus的使用。
 
+博客地址https://blog.csdn.net/u013615903/article/details/81776820
