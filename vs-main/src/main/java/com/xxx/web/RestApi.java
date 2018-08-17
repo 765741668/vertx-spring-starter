@@ -118,7 +118,11 @@ public class RestApi {
             FileSystem fs = VertxUtil.getVertxInstance().fileSystem();
             uploads.forEach(fileUpload -> {
                 String path = "D:/vertxupload/" + fileUpload.fileName();
-                fs.copyBlocking(fileUpload.uploadedFileName(), path);
+                fs.copy(fileUpload.uploadedFileName(), path, ar -> {
+                    if (ar.succeeded()) {
+                        fs.deleteBlocking(fileUpload.uploadedFileName());
+                    }
+                });
             });
             HttpUtil.fireJsonResponse(ctx.response(), HTTP_OK, ReplyObj.build().setData("OK"));
         };
