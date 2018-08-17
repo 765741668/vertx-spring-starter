@@ -8,13 +8,9 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.serviceproxy.ServiceBinder;
-import org.reflections.Reflections;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -22,7 +18,7 @@ import java.util.*;
  * 服务注册到EventBus
  */
 public class AsyncRegistVerticle extends AbstractVerticle {
-    private static final Logger logger = LoggerFactory.getLogger(AsyncRegistVerticle.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncRegistVerticle.class);
 
     private String packageAddress;
 
@@ -53,10 +49,10 @@ public class AsyncRegistVerticle extends AbstractVerticle {
             });
             CompositeFuture.all(ftList).setHandler(ar -> {
                 if (ar.succeeded()) {
-                    logger.info("All async services registered");
+                    LOGGER.info("All async services registered");
                     startFuture.complete();
                 } else {
-                    logger.error(ar.cause().getMessage());
+                    LOGGER.error(ar.cause().getMessage());
                     startFuture.fail(ar.cause());
                 }
             });

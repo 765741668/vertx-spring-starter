@@ -49,3 +49,7 @@ web-api-packages: com.xxx.web
 async-service-impl-packages: com.xxx.service.impl,com.xxx.service2.impl
 
 http-server-port: 8989
+
+worker-pool-size: 40
+
+async-service-instances: 2

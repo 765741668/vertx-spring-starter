@@ -10,11 +10,15 @@ import com.xxx.service2.UserTwoAsyncService;
 import com.xxx.utils.AsyncServiceUtil;
 import com.xxx.utils.HttpUtil;
 import com.xxx.utils.ParamUtil;
+import com.xxx.vertx.VertxUtil;
 import io.vertx.core.Handler;
+import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -42,8 +46,7 @@ public class RestApi {
     public Handler<RoutingContext> myTest() {
         return ctx -> {
             JsonObject param = ParamUtil.getRequestParams(ctx);
-            ctx.response().setStatusCode(200);
-            ctx.response().end(ReplyObj.build().setMsg("Hello，欢迎使用测试地址.....").setData(param.encode()).toString());
+            HttpUtil.fireJsonResponse(ctx.response(), HTTP_OK, ReplyObj.build().setMsg("Hello，欢迎使用测试地址.....").setData(param.encode()));
         };
     }
 
@@ -75,9 +78,23 @@ public class RestApi {
                     User user = ar.result();
                     HttpUtil.fireJsonResponse(ctx.response(), HTTP_OK, ReplyObj.build().setData(user));
                 } else {
-                    HttpUtil.fireJsonResponse(ctx.response(), HTTP_INTERNAL_ERROR, ReplyObj.build().setData(ar.cause().getMessage()).setCode(HTTP_INTERNAL_ERROR));
+                    HttpUtil.fireJsonResponse(ctx.response(), HTTP_INTERNAL_ERROR,
+                            ReplyObj.build().setData(ar.cause().getMessage()).setCode(HTTP_INTERNAL_ERROR));
                 }
             });
+        };
+    }
+
+    @RouteMapping(value = "/upload", method = RouteMethod.POST)
+    public Handler<RoutingContext> upload() {
+        return ctx -> {
+            Set<FileUpload> uploads = ctx.fileUploads();
+            FileSystem fs = VertxUtil.getVertxInstance().fileSystem();
+            uploads.forEach(fileUpload -> {
+                String path = "D:/vertxupload/" + fileUpload.fileName();
+                fs.copyBlocking(fileUpload.uploadedFileName(), path);
+            });
+            HttpUtil.fireJsonResponse(ctx.response(), HTTP_OK, ReplyObj.build().setData("OK"));
         };
     }
 
