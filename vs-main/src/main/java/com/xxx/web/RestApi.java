@@ -34,6 +34,11 @@ public class RestApi {
 
     private UserTwoAsyncService userTwoAsyncService = AsyncServiceUtil.getAsyncServiceInstance(UserTwoAsyncService.class);
 
+    /**
+     * 演示过滤器
+     *
+     * @return
+     */
     @RouteMapping(value = "/*", method = RouteMethod.ROUTE, order = 2)
     public Handler<RoutingContext> appFilter() {
         return ctx -> {
@@ -42,6 +47,11 @@ public class RestApi {
         };
     }
 
+    /**
+     * 演示路径参数
+     *
+     * @return
+     */
     @RouteMapping(value = "/test/:id", method = RouteMethod.GET)
     public Handler<RoutingContext> myTest() {
         return ctx -> {
@@ -50,6 +60,11 @@ public class RestApi {
         };
     }
 
+    /**
+     * 演示服务调用
+     *
+     * @return
+     */
     @RouteMapping(value = "/listUsers", method = RouteMethod.GET)
     public Handler<RoutingContext> listUsers() {
         return ctx -> {
@@ -61,9 +76,10 @@ public class RestApi {
             userAsyncService.listUsers(user, ar -> {
                 if (ar.succeeded()) {
                     List<User> userList = ar.result();
-                    ctx.response().setStatusCode(HTTP_OK).end(ReplyObj.build().setData(userList).toString());
+                    HttpUtil.fireJsonResponse(ctx.response(), HTTP_OK, ReplyObj.build().setData(userList));
                 } else {
-                    ctx.response().setStatusCode(500).end(ReplyObj.build().setCode(500).setMsg(ar.cause().getMessage()).toString());
+                    HttpUtil.fireJsonResponse(ctx.response(), HTTP_INTERNAL_ERROR,
+                            ReplyObj.build().setData(ar.cause().getMessage()).setCode(HTTP_INTERNAL_ERROR));
                 }
             });
         };
@@ -73,6 +89,11 @@ public class RestApi {
     public Handler<RoutingContext> findUserById() {
         return ctx -> {
             JsonObject param = ParamUtil.getRequestParams(ctx);
+            if (!param.containsKey("id")) {
+                HttpUtil.fireJsonResponse(ctx.response(), HTTP_INTERNAL_ERROR,
+                        ReplyObj.build().setMsg("缺少id参数").setCode(HTTP_INTERNAL_ERROR));
+                return;
+            }
             userTwoAsyncService.findUser(Long.valueOf(param.getString("id")), ar -> {
                 if (ar.succeeded()) {
                     User user = ar.result();
@@ -85,6 +106,11 @@ public class RestApi {
         };
     }
 
+    /**
+     * 演示文件上传
+     *
+     * @return
+     */
     @RouteMapping(value = "/upload", method = RouteMethod.POST)
     public Handler<RoutingContext> upload() {
         return ctx -> {
