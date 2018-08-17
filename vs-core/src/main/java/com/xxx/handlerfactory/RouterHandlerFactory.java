@@ -37,10 +37,15 @@ public class RouterHandlerFactory {
 
     private volatile String gatewayPrefix = GATEWAY_PREFIX;
 
+
     public RouterHandlerFactory(String routerScanAddress) {
         Objects.requireNonNull(routerScanAddress, "The router package address scan is empty.");
         reflections = ReflectionUtil.getReflections(routerScanAddress);
-        System.out.println("reflections done!");
+    }
+
+    public RouterHandlerFactory(List<String> routerScanAddresses) {
+        Objects.requireNonNull(routerScanAddresses, "The router package address scan is empty.");
+        reflections = ReflectionUtil.getReflections(routerScanAddresses);
     }
 
     public RouterHandlerFactory(String routerScanAddress, String gatewayPrefix) {
